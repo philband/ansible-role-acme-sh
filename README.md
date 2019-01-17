@@ -139,6 +139,12 @@ acme_sh_default_force_renew: False
 # could be useful if you're testing the role in staging mode.
 acme_sh_default_debug: False
 
+# Set default challenge type to use (dns or http)
+acme_sh_default_challenge_type: "http"
+
+# Set default webroot for http challenges
+acme_sh_default_http_webroot: "/home/web/http/letsencrypt"
+
 # Which DNS provider should you use?
 # A list of supported providers can be found at:
 #   https://github.com/Neilpang/acme.sh#7-automatic-dns-api-integration
@@ -247,6 +253,8 @@ acme_sh_domains:
 #
 #  If you want separate files then create a new "domains:" item in the list.
 #  - domains: ["example.com", "www.example.com", "admin.example.com"]
+#    # Optionally change default challenge type. options: ["http", "dns"]
+#    challenge_type: "http"
 #    # Optionally override the default staging variable. This overall pattern lets
 #    # you situationally override the defaults listed above for each domain list.
 #    staging: False
@@ -256,6 +264,8 @@ acme_sh_domains:
 #    force_renew: False
 #    # Optionally turn on debug mode.
 #    debug: True
+#    # Optionally change webroot (http challenge only)
+#    http_webroot: "/path/to/some/webroot"
 #    # Optionally override the default DNS provider.
 #    dns_provider: "dns_namesilo"
 #    # Optionally override the default DNS API keys.
