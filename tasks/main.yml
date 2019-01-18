@@ -138,19 +138,21 @@
 - name: Issue acme.sh certificate(s) (DNS challenge)
   command: >-
     ./acme.sh --issue -d {{ item.domains | join(" -d ") }}
-    --dns {{ item.dns_provider | default(acme_sh_default_dns_provider) }}
-    --dnssleep {{ item.dns_sleep | default(acme_sh_default_dns_sleep) }}
-    {{ "--force" if item.force_issue | default(acme_sh_default_force_issue) else "" }}
-    {{ "--staging" if item.staging | default(acme_sh_default_staging) else "" }}
-    {{ "--debug" if item.debug | default(acme_sh_default_debug) else "" }}
-    {{ "--pre-hook " + '"' + item.issue_pre_hook | default(acme_sh_default_issue_pre_hook) + '"' if item.issue_pre_hook | default(acme_sh_default_issue_pre_hook) else "" }}
-    {{ "--post-hook " + '"' + item.issue_post_hook | default(acme_sh_default_issue_post_hook) + '"' if item.issue_post_hook | default(acme_sh_default_issue_post_hook) else "" }}
-    {{ "--renew-hook " + '"' + item.issue_renew_hook | default(acme_sh_default_issue_renew_hook) + '"' if item.issue_renew_hook | default(acme_sh_default_issue_renew_hook) else "" }}
-    {{ item.extra_flags_issue | default(acme_sh_default_extra_flags_issue) }}
+    --dns {{ item.0.dns_provider | default(acme_sh_default_dns_provider) }}
+    --dnssleep {{ item.0.dns_sleep | default(acme_sh_default_dns_sleep) }}
+    -ak {{ item.0.size_account_key | default(acme_sh_default_size_account_key) }}
+    -k {{ item.1 }}
+    {{ "--force" if item.0.force_issue | default(acme_sh_default_force_issue) else "" }}
+    {{ "--staging" if item.0.staging | default(acme_sh_default_staging) else "" }}
+    {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
+    {{ "--pre-hook " + '"' + item.0.issue_pre_hook | default(acme_sh_default_issue_pre_hook) + '"' if item.0.issue_pre_hook | default(acme_sh_default_issue_pre_hook) else "" }}
+    {{ "--post-hook " + '"' + item.0.issue_post_hook | default(acme_sh_default_issue_post_hook) + '"' if item.0.issue_post_hook | default(acme_sh_default_issue_post_hook) else "" }}
+    {{ "--renew-hook " + '"' + item.0.issue_renew_hook | default(acme_sh_default_issue_renew_hook) + '"' if item.0.issue_renew_hook | default(acme_sh_default_issue_renew_hook) else "" }}
+    {{ item.0.extra_flags_issue | default(acme_sh_default_extra_flags_issue) }}
   args:
     chdir: "~/.acme.sh"
   environment: "{{ item.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys) }}"
-  loop: "{{ acme_sh_domains }}"
+  loop: "{{ acme_sh_domains | subelements (key_types | default(acme_sh_default_key_types)) }}"
   when:
     - acme_sh_domains and item.domains is defined and item.domains
     - (item.challenge_type | default(acme_sh_default_challenge_type)) == "dns"
@@ -167,18 +169,20 @@
 
 - name: Issue acme.sh certificate(s) (HTTP challenge)
   command: >-
-    ./acme.sh --issue -d {{ item.domains | join(" -d ") }}
-    -w {{ item.http_webroot | default(acme_sh_default_http_webroot) }}
-    {{ "--force" if item.force_issue | default(acme_sh_default_force_issue) else "" }}
-    {{ "--staging" if item.staging | default(acme_sh_default_staging) else "" }}
-    {{ "--debug" if item.debug | default(acme_sh_default_debug) else "" }}
-    {{ "--pre-hook " + '"' + item.issue_pre_hook | default(acme_sh_default_issue_pre_hook) + '"' if item.issue_pre_hook | default(acme_sh_default_issue_pre_hook) else "" }}
-    {{ "--post-hook " + '"' + item.issue_post_hook | default(acme_sh_default_issue_post_hook) + '"' if item.issue_post_hook | default(acme_sh_default_issue_post_hook) else "" }}
-    {{ "--renew-hook " + '"' + item.issue_renew_hook | default(acme_sh_default_issue_renew_hook) + '"' if item.issue_renew_hook | default(acme_sh_default_issue_renew_hook) else "" }}
-    {{ item.extra_flags_issue | default(acme_sh_default_extra_flags_issue) }}
+    ./acme.sh --issue -d {{ item.0.domains | join(" -d ") }}
+    -w {{ item.0.http_webroot | default(acme_sh_default_http_webroot) }}
+    -ak {{ item.0.size_account_key | default(acme_sh_default_size_account_key) }}
+    -k {{ item.1 }}
+    {{ "--force" if item.0.force_issue | default(acme_sh_default_force_issue) else "" }}
+    {{ "--staging" if item.0.staging | default(acme_sh_default_staging) else "" }}
+    {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
+    {{ "--pre-hook " + '"' + item.0.issue_pre_hook | default(acme_sh_default_issue_pre_hook) + '"' if item.0.issue_pre_hook | default(acme_sh_default_issue_pre_hook) else "" }}
+    {{ "--post-hook " + '"' + item.0.issue_post_hook | default(acme_sh_default_issue_post_hook) + '"' if item.0.issue_post_hook | default(acme_sh_default_issue_post_hook) else "" }}
+    {{ "--renew-hook " + '"' + item.0.issue_renew_hook | default(acme_sh_default_issue_renew_hook) + '"' if item.0.issue_renew_hook | default(acme_sh_default_issue_renew_hook) else "" }}
+    {{ item.0.extra_flags_issue | default(acme_sh_default_extra_flags_issue) }}
   args:
     chdir: "~/.acme.sh"
-  loop: "{{ acme_sh_domains }}"
+  loop: "{{ acme_sh_domains | subelements (key_types | default(acme_sh_default_key_types)) }}"
   when:
     - acme_sh_domains and item.domains is defined and item.domains
     - (item.challenge_type | default(acme_sh_default_challenge_type)) == "http"
@@ -193,12 +197,13 @@
 
 - name: Force renew acme.sh certificate(s)
   command: >-
-    ./acme.sh --renew -d {{ item.domains | first }} --force
-    {{ "--debug" if item.debug | default(acme_sh_default_debug) else "" }}
-    {{ item.extra_flags_renew | default(acme_sh_default_extra_flags_renew) }}
+    ./acme.sh --renew -d {{ item.0.domains | first }} --force
+    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms}}
+    {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
+    {{ item.0.extra_flags_renew | default(acme_sh_default_extra_flags_renew) }}
   args:
     chdir: "~/.acme.sh"
-  loop: "{{ acme_sh_domains }}"
+  loop: "{{ acme_sh_domains | subelements (key_types | default(acme_sh_default_key_types)) }}"
   when:
     - acme_sh_domains and item.domains is defined and item.domains
     - item.force_issue is undefined or not item.force_issue
@@ -224,15 +229,16 @@
 
 - name: Install acme.sh certificate(s)
   command: >-
-    ./acme.sh --install-cert -d {{ item.domains | first }}
-    --key-file {{ acme_sh_copy_certs_to_path }}/{{ item.domains | first }}.key
-    --fullchain-file {{ acme_sh_copy_certs_to_path }}/{{ item.domains | first }}.pem
-    --reloadcmd "{{ item.install_cert_reloadcmd | default(acme_sh_default_install_cert_reloadcmd) }}"
-    {{ "--debug" if item.debug | default(acme_sh_default_debug) else "" }}
-    {{ item.extra_flags_install_cert | default(acme_sh_default_extra_flags_install_cert) }}
+    ./acme.sh --install-cert -d {{ item.0.domains | first }}
+    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms}}
+    --key-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.key
+    --fullchain-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.pem
+    --reloadcmd "{{ item.0.install_cert_reloadcmd | default(acme_sh_default_install_cert_reloadcmd) }}"
+    {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
+    {{ item.0.extra_flags_install_cert | default(acme_sh_default_extra_flags_install_cert) }}
   args:
     chdir: "~/.acme.sh"
-  loop: "{{ acme_sh_domains }}"
+  loop: "{{ acme_sh_domains | subelements (key_types | default(acme_sh_default_key_types)) }}"
   loop_control:
     index_var: domains_index
   when:

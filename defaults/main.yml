@@ -25,6 +25,14 @@ acme_sh_default_force_renew: false
 
 acme_sh_default_debug: false
 
+acme_sh_default_size_account_key: 4096
+acme_sh_default_key_types:
+  - "4096"
+acme_sh_ecc_algorithms: ["ec-256", "ec-384", "ec-521"]
+
+acme_sh_default_issue_rsa: true
+acme_sh_default_issue_ecdsa: true
+
 acme_sh_default_challenge_type: "http"
 
 acme_sh_default_http_webroot: "/home/web/http/letsencrypt"
