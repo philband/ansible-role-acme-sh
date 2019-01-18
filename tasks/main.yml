@@ -230,7 +230,7 @@
 - name: Install acme.sh certificate(s)
   command: >-
     ./acme.sh --install-cert -d {{ item.0.domains | first }}
-    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms}}
+    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms else "" }}
     --key-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.key
     --fullchain-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.pem
     --reloadcmd "{{ item.0.install_cert_reloadcmd | default(acme_sh_default_install_cert_reloadcmd) }}"
@@ -239,8 +239,8 @@
   args:
     chdir: "~/.acme.sh"
   loop: "{{ lookup('subelements_defaults', acme_sh_domains, 'key_types', {'default_value': acme_sh_default_key_types}) }}"
-  # loop_control:
-  #  index_var: domains_index
+  loop_control:
+    index_var: domains_index
   when:
     - acme_sh_domains and item.0.domains is defined and item.0.domains
     - item.0.custom_command is undefined or not item.0.custom_command
@@ -248,7 +248,7 @@
     - not acme_sh_uninstall
   become_user: "{{ acme_sh_become_user | default(acme_sh_default_become_user) }}"
   register: install_cert_result
-  # changed_when: issue_result.results[domains_index].changed or renew_result.results[domains_index].changed
+  changed_when: issue_result.results[domains_index].changed or renew_result.results[domains_index].changed
   failed_when: install_cert_result.rc != 0 and "Reload error for" not in install_cert_result.stderr
 
 - name: Register acme.sh certificate information
