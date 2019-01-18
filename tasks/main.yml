@@ -198,7 +198,7 @@
 - name: Force renew acme.sh certificate(s)
   command: >-
     ./acme.sh --renew -d {{ item.0.domains | first }} --force
-    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms}}
+    {{ "--ecc" if item.1 in acme_sh_ecc_algorithms else "" }}
     {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
     {{ item.0.extra_flags_renew | default(acme_sh_default_extra_flags_renew) }}
   args:
@@ -231,8 +231,8 @@
   command: >-
     ./acme.sh --install-cert -d {{ item.0.domains | first }}
     {{ "--ecc" if item.1 in acme_sh_ecc_algorithms else "" }}
-    --key-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.key
-    --fullchain-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms}}.pem
+    --key-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms else "" }}.key
+    --fullchain-file {{ acme_sh_copy_certs_to_path }}/{{ item.0.domains | first }}{{ "-ecc" if item.1 in acme_sh_ecc_algorithms else "" }}.pem
     --reloadcmd "{{ item.0.install_cert_reloadcmd | default(acme_sh_default_install_cert_reloadcmd) }}"
     {{ "--debug" if item.0.debug | default(acme_sh_default_debug) else "" }}
     {{ item.0.extra_flags_install_cert | default(acme_sh_default_extra_flags_install_cert) }}
