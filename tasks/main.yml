@@ -154,7 +154,7 @@
   environment: "{{ item.0.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys) }}"
   with_subelements:
     - "{{ acme_sh_domains }}"
-    - "{{ key_types | default(acme_sh_default_key_types) }}"
+    - "{{ 'key_types' | default(acme_sh_default_key_types) }}"
   when:
     - acme_sh_domains and item.0.domains is defined and item.0.domains
     - (item.0.challenge_type | default(acme_sh_default_challenge_type)) == "dns"
@@ -186,7 +186,7 @@
     chdir: "~/.acme.sh"
   with_subelements:
     - "{{ acme_sh_domains }}"
-    - "{{ key_types | default(acme_sh_default_key_types) }}"
+    - "{{ 'key_types' | default(acme_sh_default_key_types) }}"
   when:
     - acme_sh_domains and item.0.domains is defined and item.0.domains
     - (item.0.challenge_type | default(acme_sh_default_challenge_type)) == "http"
@@ -209,7 +209,7 @@
     chdir: "~/.acme.sh"
   with_subelements:
     - "{{ acme_sh_domains }}"
-    - "{{ key_types | default(acme_sh_default_key_types) }}"
+    - "{{ 'key_types' | default(acme_sh_default_key_types) }}"
   when:
     - acme_sh_domains and item.0.domains is defined and item.0.domains
     - item.0.force_issue is undefined or not item.0.force_issue
