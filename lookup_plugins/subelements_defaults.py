@@ -148,12 +148,16 @@ class LookupModule(LookupBase):
                 if subkey not in subvalue:
                     if skip_missing:
                         if isinstance(default_value, list):
-                          sublist = default_value
-                          break
+                            sublist = default_value
+                            break
                         else:
-                          continue
+                            continue
                     else:
-                        raise AnsibleError("could not find '%s' key in iterated item '%s'" % (subkey, subvalue))
+                        if isinstance(default_value, list):
+                            sublist = default_value
+                            break
+                        else:
+                            raise AnsibleError("could not find '%s' key in iterated item '%s'" % (subkey, subvalue))
                 if not lastsubkey:
                     if not isinstance(subvalue[subkey], dict):
                         if skip_missing:
