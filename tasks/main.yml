@@ -137,7 +137,7 @@
 
 - name: Issue acme.sh certificate(s) (DNS challenge)
   command: >-
-    ./acme.sh --issue -d {{ item.domains | join(" -d ") }}
+    ./acme.sh --issue -d {{ item.0.domains | join(" -d ") }}
     --dns {{ item.0.dns_provider | default(acme_sh_default_dns_provider) }}
     --dnssleep {{ item.0.dns_sleep | default(acme_sh_default_dns_sleep) }}
     -ak {{ item.0.size_account_key | default(acme_sh_default_size_account_key) }}
@@ -151,7 +151,7 @@
     {{ item.0.extra_flags_issue | default(acme_sh_default_extra_flags_issue) }}
   args:
     chdir: "~/.acme.sh"
-  environment: "{{ item.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys) }}"
+  environment: "{{ item.0.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys) }}"
   loop: "{{ acme_sh_domains | subelements({{ key_types | default(acme_sh_default_key_types) }}) }}"
   when:
     - acme_sh_domains and item.0.domains is defined and item.0.domains
