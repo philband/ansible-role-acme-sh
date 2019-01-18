@@ -154,13 +154,13 @@
   environment: "{{ item.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys) }}"
   loop: "{{ acme_sh_domains | subelements(key_types | default(acme_sh_default_key_types)) }}"
   when:
-    - acme_sh_domains and item.domains is defined and item.domains
-    - (item.challenge_type | default(acme_sh_default_challenge_type)) == "dns"
-    - item.dns_provider | default(acme_sh_default_dns_provider)
-    - item.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys)
-    - item.force_renew is undefined or not item.force_renew
-    - item.custom_command is undefined or not item.custom_command
-    - item.remove is undefined or not item.remove
+    - acme_sh_domains and item.0.domains is defined and item.0.domains
+    - (item.0.challenge_type | default(acme_sh_default_challenge_type)) == "dns"
+    - item.0.dns_provider | default(acme_sh_default_dns_provider)
+    - item.0.dns_provider_api_keys | default(acme_sh_default_dns_provider_api_keys)
+    - item.0.force_renew is undefined or not item.0.force_renew
+    - item.0.custom_command is undefined or not item.0.custom_command
+    - item.0.remove is undefined or not item.0.remove
     - not acme_sh_uninstall
   become_user: "{{ acme_sh_become_user | default(acme_sh_default_become_user) }}"
   register: issue_result
@@ -184,11 +184,11 @@
     chdir: "~/.acme.sh"
   loop: "{{ acme_sh_domains | subelements(key_types | default(acme_sh_default_key_types)) }}"
   when:
-    - acme_sh_domains and item.domains is defined and item.domains
-    - (item.challenge_type | default(acme_sh_default_challenge_type)) == "http"
-    - item.force_renew is undefined or not item.force_renew
-    - item.custom_command is undefined or not item.custom_command
-    - item.remove is undefined or not item.remove
+    - acme_sh_domains and item.0.domains is defined and item.0.domains
+    - (item.0.challenge_type | default(acme_sh_default_challenge_type)) == "http"
+    - item.0.force_renew is undefined or not item.0.force_renew
+    - item.0.custom_command is undefined or not item.0.custom_command
+    - item.0.remove is undefined or not item.0.remove
     - not acme_sh_uninstall
   become_user: "{{ acme_sh_become_user | default(acme_sh_default_become_user) }}"
   register: issue_result
@@ -205,10 +205,10 @@
     chdir: "~/.acme.sh"
   loop: "{{ acme_sh_domains | subelements(key_types | default(acme_sh_default_key_types)) }}"
   when:
-    - acme_sh_domains and item.domains is defined and item.domains
-    - item.force_issue is undefined or not item.force_issue
-    - item.force_renew is defined and item.force_renew
-    - item.remove is undefined or not item.remove
+    - acme_sh_domains and item.0.domains is defined and item.0.domains
+    - item.0.force_issue is undefined or not item.0.force_issue
+    - item.0.force_renew is defined and item.0.force_renew
+    - item.0.remove is undefined or not item.0.remove
     - not acme_sh_uninstall
   become_user: "{{ acme_sh_become_user | default(acme_sh_default_become_user) }}"
   register: renew_result
@@ -242,9 +242,9 @@
   loop_control:
     index_var: domains_index
   when:
-    - acme_sh_domains and item.domains is defined and item.domains
-    - item.custom_command is undefined or not item.custom_command
-    - item.remove is undefined or not item.remove
+    - acme_sh_domains and item.0.domains is defined and item.0.domains
+    - item.0.custom_command is undefined or not item.0.custom_command
+    - item.0.remove is undefined or not item.0.remove
     - not acme_sh_uninstall
   become_user: "{{ acme_sh_become_user | default(acme_sh_default_become_user) }}"
   register: install_cert_result
